@@ -23,7 +23,10 @@ def live_dashboard(tmp_path, monkeypatch, request):
     monkeypatch.setenv("DEMO_RESET_ENABLED", "1")
     for name in ("GPS_WINDOW_START", "GPS_WINDOW_END", "GPS_EXPECTED_INTERVAL_SECONDS"):
         monkeypatch.delenv(name, raising=False)
-    if getattr(request, "param", False):
+    mode = getattr(request, "param", None)
+    if mode == "public":
+        monkeypatch.setenv("DEMO_PUBLIC_READONLY", "true")
+    if mode is True:
         monkeypatch.setenv("GPS_WINDOW_START", "2026-11-16T16:00:00Z")
         monkeypatch.setenv("GPS_WINDOW_END", "2026-11-16T21:05:00Z")
         monkeypatch.setenv("GPS_EXPECTED_INTERVAL_SECONDS", "300")
@@ -158,4 +161,28 @@ def test_dashboard_shows_expected_sampling_when_configured(live_dashboard):
         expect(rows).to_have_count(2)
         expect(rows.first.locator("td").nth(5)).to_have_text("100.0%")
         expect(rows.last.locator("td").nth(5)).to_have_text("N/A")
+        browser.close()
+
+@pytest.mark.parametrize("live_dashboard", ["public"], indirect=True)
+def test_public_dashboard_hides_writes_and_keeps_map_and_export(live_dashboard):
+    from playwright.sync_api import expect, sync_playwright
+
+    url, _ = live_dashboard
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(channel=os.getenv("BROWSER_CHANNEL"))
+        page = browser.new_page(viewport={"width": 390, "height": 844})
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(url + "/") else route.abort())
+        page.goto(f"{url}/?basemap=none")
+        expect(page.locator(".gps-route").first).to_be_visible()
+        expect(page.locator("#upload-form")).to_be_hidden()
+        expect(page.locator("#restore-demo")).to_be_hidden()
+        expect(page.locator("#import-result")).to_contain_text("disabled")
+        page.locator("#participant").select_option("SYN-P002")
+        page.locator("#day").select_option("2026-11-17")
+        expect(page.locator("#daily-metrics tr")).to_have_count(1)
+        with page.expect_download() as download:
+            page.locator("#export-btn").click()
+        assert download.value.suggested_filename.endswith(".csv")
+        assert page.request.post(url + "/api/import").status == 403
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         browser.close()

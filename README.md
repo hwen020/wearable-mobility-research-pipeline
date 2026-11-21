@@ -18,6 +18,10 @@ flowchart LR
 
 **Release verification** · See [v1.0.0 release report](docs/RELEASE_REPORT.md) for SQLite, MySQL, Edge and Docker results.
 
+## Live Demo
+
+The public Render URL is pending publication approval. See [Render deployment and acceptance](docs/DEPLOYMENT.md#render-free-blueprint).
+
 ## Start on Windows
 
 Install Python 3.11+ and open the project folder in VS Code. In PowerShell:

@@ -1,1 +1,2 @@
 data/synthetic_wearable.csv -text whitespace=cr-at-eol
+docker-entrypoint.sh text eol=lf

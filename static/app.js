@@ -194,7 +194,7 @@ async function refreshAll() {
 }
 async function boot() {
   initializeMap();
-  try {const state=await api('/api/health');byId('health').textContent=`API ONLINE · ${state.version}`; byId('restore-demo').hidden = !state.demo_restore_enabled; if (state.read_only) { byId('upload-form').hidden = true; byId('import-result').textContent = 'CSV upload is disabled in this hosted demo.'; } byId('day-label').textContent = `Study date (${state.study_timezone})`; await refreshAll();}
+  try {const state=await api('/api/health');byId('health').textContent=`API ONLINE · ${state.version}`; byId('restore-demo').hidden = !state.demo_restore_enabled; byId('upload-form').hidden = state.read_only; if (state.read_only) { byId('import-result').textContent = 'CSV upload is disabled in this hosted demo.'; } byId('day-label').textContent = `Study date (${state.study_timezone})`; await refreshAll();}
   catch(err){byId('health').textContent=`API OFFLINE · ${err.message}`; byId('health').style.color='#ff9a9a';}
 }
 byId('participant').addEventListener('change',()=>{updateDays();loadSelected();});

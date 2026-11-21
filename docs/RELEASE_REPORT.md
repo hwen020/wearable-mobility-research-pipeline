@@ -1,5 +1,24 @@
 # Wearable Mobility Research Pipeline v1.0.0 release report
 
+
+## GitHub and Render publication preparation
+
+The existing `30378f1` release is retained in local Git history. Publication preparation adds a Render Free Docker Blueprint, an environment-driven listener, and a public read-only mode. The original synthetic dataset checksum is unchanged.
+
+| Check | Result |
+|---|---|
+| Original release regression | PASS. 41 tests passed with SQLite, disposable MySQL 9.0.1 and Edge. |
+| Updated candidate regression | PASS. 43 tests passed with SQLite, MySQL 9.0.1 and Edge in 40.80 seconds. The suite includes the new public mutation guard and mobile browser checks for maps, filtering, CSV download and hidden write controls. |
+| Public-mode native HTTP smoke | PASS. Seeding twice retained 366 observations; a custom-port Uvicorn process served health, map data, daily analysis and exports. Import, reset, update and delete requests returned 403. |
+| Render Blueprint, Docker startup shell and GitHub Actions configuration | PASS. Verified locally against the documented Render fields and checked shell syntax. The Docker workflow exercises port 10000 and the Free-tier CPU and RAM limits. |
+| Local Render candidate Docker build | FAILED. Both the local Docker engine query and build attempt timed out. |
+| Render candidate container and Free-tier GeoPandas capacity | NOT VERIFIED. The earlier v1.0.0 in-container result below covers the previous image only. |
+| Privacy and Git | PASS. Candidate file scan found no recognized credentials, personal absolute paths or tracked database/cache artifacts. Canonical synthetic fixture bytes match the released checksum. |
+| GitHub repository, hosted CI, Render deployment and logs | NOT VERIFIED. No configured remote or usable account connector was available. Publication requires explicit authorization. |
+| Real public HTTPS browser acceptance | NOT VERIFIED. No public endpoint exists. |
+
+Render is configured to seed a fresh ephemeral SQLite database before opening the port and rejects visitor mutations at the application boundary. See [Render deployment and acceptance](DEPLOYMENT.md#render-free-blueprint). The section below retains the earlier v1.0.0 acceptance history.
+
 Release readiness assessed on 2026-11-20. Scope is a synthetic-only geospatial portfolio demo.
 
 ## Changes in this release

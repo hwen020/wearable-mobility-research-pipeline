@@ -52,3 +52,17 @@ After starting the image, run the following from the source checkout:
 ```text
 python -m scripts.smoke_release http://127.0.0.1:8000
 ```
+
+
+## Render Free Blueprint
+
+The root [render.yaml](../render.yaml) selects a Free Docker web service with a health probe at `/api/health` and automatic deploys disabled. The Docker command starts one Uvicorn process on `0.0.0.0` and the platform-provided `PORT`, or 8000 for local Docker. It retains the existing geospatial dependencies and limits numerical library threading to one thread through environment settings in the Blueprint. [Render Web Services](https://render.com/docs/web-services) ? [Blueprint reference](https://render.com/docs/blueprint-spec) ? [Free resources](https://render.com/docs/compute-plans)
+
+With `DEMO_PUBLIC_READONLY=true`, each Docker launch selects a fresh temporary SQLite database and seeds it from the bundled synthetic fixture before opening the port. The API rejects methods other than GET, HEAD and OPTIONS before parsing request bodies. The import form and restore control are hidden, and the upload operation is excluded from the public OpenAPI schema. Downloads, maps, filtering and analyses remain available. The Windows launcher and local Docker default continue to support imports. Render Free filesystem changes are ephemeral and the service can spin down while idle. [Render Free behavior](https://render.com/docs/free)
+
+After explicit authorization to create and push the GitHub repository and deploy the service:
+
+1. Push the reviewed branch and confirm the GitHub Verify run. The workflow includes a public-mode container test on port 10000 under a 0.1 CPU and 512 MiB Docker limit.
+2. Import the root Blueprint from the reviewed repository in the authorized Render workspace. Confirm the Free Docker plan, no disk or external database, and `DEMO_PUBLIC_READONLY=true`. Apply only after approval to deploy.
+3. Confirm the startup log shows the seed succeeded, the service is listening on the selected port, and the health check is green. Add the actual HTTPS URL to the README.
+4. Run the smoke script against that HTTPS URL with `--public`. In a real browser, verify HTTPS, the home page, map layers, filtering, analytics, downloads, mobile layout, and write restrictions. Record the actual Render logs and GitHub Actions run in the release report.

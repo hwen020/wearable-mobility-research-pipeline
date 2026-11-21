@@ -4,30 +4,42 @@ import csv
 import io
 import json
 from time import monotonic, sleep
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("base_url")
-    base = parser.parse_args().base_url.rstrip("/")
+    parser.add_argument("--public", action="store_true")
+    args = parser.parse_args()
+    base = args.base_url.rstrip("/")
 
     def read(path):
         with urlopen(base + path, timeout=4) as response:
             return response.read()
 
-    deadline = monotonic() + 55
+    deadline = monotonic() + (120 if args.public else 55)
     while True:
         try:
             health = json.loads(read("/api/health"))
             break
-        except OSError:
+        except (OSError, json.JSONDecodeError):
             if monotonic() >= deadline:
                 raise
             sleep(1)
 
     assert health["version"] == "1.0.0" and health["data_policy"] == "SYNTHETIC_ONLY"
     assert not health["demo_restore_enabled"]
+    if args.public:
+        assert health["public_read_only"]
+        for method, path in (("POST", "/api/import"), ("POST", "/api/demo/restore"),
+                             ("PUT", "/api/participants"), ("DELETE", "/api/participants/SYN-P001")):
+            try:
+                with urlopen(Request(base + path, method=method), timeout=4):
+                    raise AssertionError(f"{method} {path} was allowed")
+            except HTTPError as exc:
+                assert exc.code == 403, (method, path, exc.code)
     summary = json.loads(read("/api/summary"))
     assert summary["participants"] == 3 and summary["observations"] == 366
     assert b"Wearable Mobility Research Pipeline" in read("/")

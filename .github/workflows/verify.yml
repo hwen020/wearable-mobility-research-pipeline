@@ -29,6 +29,6 @@ jobs:
       - name: Smoke test the release image
         shell: bash
         run: |
-          container=$(docker run -d -e DEMO_READ_ONLY=1 wearable-mobility-research-pipeline:1.0.0)
+          container=$(docker run -d --cpus=0.1 --memory=512m --memory-swap=512m -e PORT=10000 -e OPENBLAS_NUM_THREADS=1 -e OMP_NUM_THREADS=1 -e DEMO_PUBLIC_READONLY=true wearable-mobility-research-pipeline:1.0.0)
           trap 'docker logs "$container"; docker rm -f "$container"' EXIT
-          docker exec -i "$container" python - http://127.0.0.1:8000 < scripts/smoke_release.py
+          docker exec -i "$container" python - http://127.0.0.1:10000 --public < scripts/smoke_release.py

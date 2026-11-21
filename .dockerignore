@@ -11,3 +11,4 @@
 !requirements.txt
 **/__pycache__/
 **/*.pyc
+!docker-entrypoint.sh

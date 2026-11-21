@@ -34,7 +34,8 @@ def create_app(db_engine=None):
     db_engine = db_engine or default_engine
     zone = ZoneInfo(os.getenv("STUDY_TIMEZONE", "UTC"))
     sampling = SamplingPolicy.from_environment()
-    read_only = os.getenv("DEMO_READ_ONLY") == "1"
+    public_read_only = os.getenv("DEMO_PUBLIC_READONLY", "").strip().lower() == "true"
+    read_only = public_read_only or os.getenv("DEMO_READ_ONLY") == "1"
     allow_demo_restore = not read_only and db_engine.dialect.name == "sqlite" and os.getenv("DEMO_RESET_ENABLED") == "1"
     sessions = sessionmaker(bind=db_engine, expire_on_commit=False)
 
@@ -45,6 +46,13 @@ def create_app(db_engine=None):
 
     app = FastAPI(title="Wearable Mobility Research Pipeline", version=VERSION, lifespan=lifespan,
                   description="Synthetic-only research demo. No Fitbit OAuth or real patient data.")
+    if public_read_only:
+        @app.middleware("http")
+        async def block_public_writes(request: Request, call_next):
+            if request.method not in {"GET", "HEAD", "OPTIONS"}:
+                return JSONResponse({"detail": "The public demo is read-only"}, status_code=403)
+            return await call_next(request)
+
     app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
 
     def get_points(session, pid=None, on_date=None, limit=None, offset=0):
@@ -82,7 +90,7 @@ def create_app(db_engine=None):
         if allow_demo_restore and local_request(request):
             with sessions() as session:
                 can_restore = demo_marked(session)
-        return {"status":"ok", "version":VERSION, "data_policy":"SYNTHETIC_ONLY", "database":"configured", "study_timezone":zone.key, "demo_restore_enabled":can_restore, "read_only":read_only}
+        return {"status":"ok", "version":VERSION, "data_policy":"SYNTHETIC_ONLY", "database":"configured", "study_timezone":zone.key, "demo_restore_enabled":can_restore, "read_only":read_only, "public_read_only":public_read_only}
 
     if allow_demo_restore:
         @app.post("/api/demo/restore")
@@ -240,7 +248,7 @@ def create_app(db_engine=None):
                 headers={"Content-Disposition": f'attachment; filename="{pid}_{dataset}.csv"',
                          "X-Research-Metadata": json.dumps(research_metadata(pid, date_filter))})
 
-    @app.post("/api/import")
+    @app.post("/api/import", include_in_schema=not public_read_only)
     def import_file(file: UploadFile = File(...)):
         if read_only:
             raise HTTPException(403, "CSV import is disabled in the read-only demo")
