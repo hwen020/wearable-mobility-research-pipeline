@@ -20,7 +20,9 @@ flowchart LR
 
 ## Live Demo
 
-The public Render URL is pending publication approval. See [Render deployment and acceptance](docs/DEPLOYMENT.md#render-free-blueprint).
+[Open the read-only Live Demo](https://wearable-mobility-research-pipeline.onrender.com/) | [GitHub repository](https://github.com/hwen020/wearable-mobility-research-pipeline) | [Release CI run](https://github.com/hwen020/wearable-mobility-research-pipeline/actions/runs/44871288134)
+
+The Render Free demo contains 366 synthetic observations and supports GIS maps, filters, analytics and downloads. CSV import and demo restore are available in local mode. The Free service may take a moment to wake after inactivity. [Render deployment and acceptance](docs/DEPLOYMENT.md#render-free-blueprint).
 
 ## Start on Windows
 

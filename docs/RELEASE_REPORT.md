@@ -1,6 +1,19 @@
 # Wearable Mobility Research Pipeline v1.0.0 release report
 
 
+## Public GitHub and Render acceptance
+
+- [Public GitHub repository](https://github.com/hwen020/wearable-mobility-research-pipeline) and [Live Demo](https://wearable-mobility-research-pipeline.onrender.com/)
+- Published the original three-commit history on main. The lightweight `v1.0.0` tag resolves to `aee99f9cf3ea7e3b9ec1239b083aeb8718c91853`, the same commit deployed on Render. All three original commit trees passed the privacy and fixture checksum review before publication.
+- [GitHub Actions run 44871288134](https://github.com/hwen020/wearable-mobility-research-pipeline/actions/runs/44871288134): SUCCESS on the tagged release commit. Hosted pytest recorded 43 passed and one opt-in MySQL skip. Chromium checks, Linux image build and the public-mode HTTP smoke under the configured CPU and RAM limits completed.
+- Render deployment `dep-dc0ipnp7lnhs738q2c4g` is live as a Free Docker web service with automatic deploy disabled. Startup logs show one Uvicorn start on `0.0.0.0:10000`, one seed accepting all 366 observations, and repeated successful `/api/health` probes.
+- Real Edge over trusted HTTPS passed Dashboard, basemap tile and GIS overlays, study-date and participant filters, daily analytics, a 61-row CSV download, GeoJSON download, and the 390 px mobile viewport. Upload and restore controls were hidden. Public POST, PUT, PATCH and DELETE probes returned 403 and the study summary did not change.
+- The inspected deployment window contained 77 non-build logs with no startup failure, out-of-memory event, or HTTP 5xx. Initial Render telemetry contained 3 memory samples with a maximum of 120,598,530 bytes (about 115 MiB) and 2 CPU samples with a maximum of 0.1102 CPU. These are short observation-window measurements. Sustained-load behavior remains unverified.
+- Local Docker on Windows remains unverified due to the earlier engine timeout. The hosted build and the live deployment validate the release image on Linux.
+
+The sections below preserve the local preparation and verification history.
+
+
 ## Final local acceptance for the v1.0.0 tag
 
 The workspace was clean at `d88f89c` with no staged or unstaged changes. The original release commit `30378f1` remains an ancestor.
