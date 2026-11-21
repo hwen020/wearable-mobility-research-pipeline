@@ -1,0 +1,21 @@
+services:
+  mysql:
+    profiles: ["mysql"]
+    image: mysql:8.4
+    command: ["--collation-server=utf8mb4_0900_as_cs"]
+    ports:
+      - "127.0.0.1:3307:3306"
+    environment:
+      MYSQL_DATABASE: mobility_demo
+      MYSQL_USER: mobility_demo
+      MYSQL_PASSWORD: ${MOBILITY_MYSQL_PASSWORD:?set a password for the local demo account}
+      MYSQL_ROOT_PASSWORD: ${MOBILITY_MYSQL_ROOT_PASSWORD:?set a separate local root password}
+    volumes:
+      - mysql-demo:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+volumes:
+  mysql-demo:

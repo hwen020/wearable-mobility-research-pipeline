@@ -1,0 +1,4 @@
+participant_id,timestamp_utc,latitude,longitude,steps,heart_rate_bpm,source
+SYN-EX01,2026-11-19T16:00:00Z,34.020500,-118.285600,10,82,synthetic
+SYN-EX01,2026-11-19T16:05:00Z,34.020600,-118.285300,35,93,synthetic
+SYN-EX01,2026-11-19T16:10:00Z,34.020650,-118.285200,40,95,synthetic

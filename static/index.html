@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Wearable Mobility Research Pipeline — Research Data Console</title>
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">◈</div><div><strong>WEARABLE <span>MOBILITY</span></strong><small>RESEARCH CONSOLE / v1.0.0</small></div></div>
+    <div class="workspace-label">WORKSPACE</div>
+    <nav><a class="nav-link active" href="#overview">▦ &nbsp; Overview</a>
+      <a class="nav-link" href="#explorer">◉ &nbsp; Mobility map</a>
+      <a class="nav-link" href="#analytics">Participant analytics</a>
+      <a class="nav-link" href="#quality">Data quality</a>
+      <a class="nav-link" href="#ingestion">⇧ &nbsp; Import / export</a>
+      <a class="nav-link" href="#methods">Methods</a>
+      <a class="nav-link" href="/docs" target="_blank" rel="noreferrer">⧉ &nbsp; API docs ↗</a></nav>
+    <div class="sidebar-bottom"><div class="privacy-icon">✳</div><div><b>Privacy-first demo</b><p>All sample participants and mobility traces are synthetic. No real wearable credentials or patient data.</p></div></div>
+  </aside>
+
+  <main class="content" id="overview">
+    <header class="topbar"><div class="breadcrumbs">LAB / <span>GEOSPATIAL RESEARCH</span></div><div class="status"><i></i><span id="health">Checking API...</span></div></header>
+    <section class="intro"><div><div class="eyebrow">STUDY DASHBOARD <span class="dot-sep">•</span> SYNTHETIC STUDY</div><h1>Wearable Mobility Research Pipeline</h1><p>Explore GPS trajectories, wearable activity signals, spatial patterns, and data quality — in one research workspace.</p></div></section>
+    <section class="metric-grid" aria-label="Study statistics">
+      <article class="metric"><div class="metric-head">PARTICIPANTS <span>◈</span></div><strong id="metric-participants">—</strong><small>Pseudonymized research IDs</small></article>
+      <article class="metric"><div class="metric-head">GPS OBSERVATIONS <span>⊕</span></div><strong id="metric-observations">—</strong><small>UTC timestamped records</small></article>
+      <article class="metric"><div class="metric-head">TOTAL DISTANCE <span>⌁</span></div><strong id="metric-distance">—</strong><small>km · filtered for implausible jumps</small></article>
+      <article class="metric"><div class="metric-head">PARTICIPANT-DAYS <span>▥</span></div><strong id="metric-days">—</strong><small>Daily movement summaries</small></article>
+    </section>
+
+    <p id="study-dates" class="panel-copy" aria-live="polite"></p>
+    <section class="explorer section" id="explorer"><div class="section-heading"><div><h2>Trajectory analysis</h2><p>Projected activity areas, dwell clusters, and route segments.</p></div><div class="actions"><select id="export-format" aria-label="Export format">
+    <option value="observations">Observations CSV</option><option value="daily">Daily metrics CSV</option>
+    <option value="geojson">All map layers GeoJSON</option><option value="route">Route GeoJSON</option>
+    <option value="stay">Stay points GeoJSON</option><option value="activity_area">Activity area GeoJSON</option>
+    <option value="metadata">Analysis metadata JSON</option>
+    </select><button id="export-btn" class="btn-secondary">Download</button></div></div>
+      <div class="analysis-shell">
+        <div class="map-area"><div id="map" role="img" aria-label="Map of synthetic research trajectories"><div class="map-placeholder">Loading map…</div></div><div class="map-key"><div><i class="legend-line"></i> GPS route</div><div><i class="legend-stay"></i> Dwell point</div><div><i class="legend-area"></i> Activity area</div><div><i class="legend-start"></i> Start</div><div><i class="legend-end"></i> End</div></div><div id="map-status" class="map-status" role="status"></div><div class="map-footer">WGS84 → local projected CRS for area analysis <span>● SYNTHETIC</span></div></div>
+        <div class="explorer-controls"><label for="participant">Participant ID</label><select id="participant" aria-label="Participant ID"><option>Loading…</option></select><label id="day-label" for="day">Study date (UTC)</label><select id="day"><option value="">All available dates</option></select>
+          <fieldset id="layer-options"><legend>Map layers</legend>
+          <label><input type="checkbox" value="route" checked> Route</label>
+          <label><input type="checkbox" value="stay" checked> Stay points</label>
+          <label><input type="checkbox" value="activity_area" checked> Activity area</label>
+          <label><input type="checkbox" value="markers" checked> Start / end</label>
+          </fieldset>
+          <div class="stat-line"><span>GPS records</span><b id="selected-samples">—</b></div><div class="stat-line"><span>Travel distance</span><b id="selected-distance">—</b></div><div class="stat-line"><span>Steps recorded</span><b id="selected-steps">—</b></div><div class="stat-line"><span>Dwell clusters</span><b id="selected-stays">—</b></div><div class="stat-line"><span>Speed anomalies</span><b id="selected-anomalies">—</b></div>
+          <div class="control-divider"></div><div class="callout"><b>Analysis note</b><p>Dwell means remaining within 120 m for at least 15 minutes. Spatial area = convex hull of 100 m buffers in projected meters.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section panel" id="analytics"><h2>Participant analytics</h2>
+      <p class="panel-copy" id="analytics-context" aria-live="polite">Loading daily metrics…</p>
+      <div id="daily-chart" class="daily-chart" role="group" aria-label="Daily distance chart"></div>
+      <div class="table-scroll" tabindex="0" aria-label="Daily metrics table"><table>
+        <thead><tr><th>Study date</th><th>Samples</th><th>Steps</th><th>Distance (km)</th><th>Mean HR (bpm)</th>
+          <th>Observed Validity Rate</th><th>Expected Sampling Coverage</th><th>Speed jumps</th><th>Sampling gaps</th><th>Repeated coordinates</th></tr></thead>
+        <tbody id="daily-metrics"></tbody>
+      </table></div>
+    </section>
+    <section class="bottom-grid"><article class="panel" id="ingestion"><div class="panel-header"><div><h2>Import a study CSV</h2></div><div class="panel-icon">⇧</div></div><p class="panel-copy">Ingest a synthetic GPS + wearable dataset. Validate coordinate ranges, timezone, duplicate IDs, steps and heart rate before storage.</p><form id="upload-form"><label class="upload-zone" for="csv-file"><span>⌁</span><b>Choose a CSV file</b><small>UTF-8 · max 5 MB · synthetic only</small><input id="csv-file" type="file" accept=".csv,text/csv" required></label><button class="primary" type="submit">Validate & import <span>↗</span></button></form><pre id="import-preview" class="import-preview" hidden></pre><div id="import-result" class="import-result" aria-live="polite"></div><p class="sample-link"><a href="/static/sample_schema.csv" download>↓ Download example CSV format</a></p><button id="restore-demo" type="button" class="btn-secondary" hidden>Restore demo data</button></article>
+      <article class="panel" id="quality"><div class="panel-header"><div><h2>Data quality</h2></div><div class="panel-icon">◎</div></div><div class="quality-top"><div class="quality-number" id="quality-outliers">—</div><div><b>Implausible speed jumps</b><p>Flagged and excluded from the distance metric and route lines.</p></div></div><div class="control-divider"></div><div class="mini-caption">RECENT IMPORTS</div><div id="imports-list" class="imports-list">Loading import history…</div><div class="quality-filters">
+        <label for="quality-batch">Import batch</label><select id="quality-batch"></select>
+        <label for="quality-reason">Rejection reason</label><select id="quality-reason"></select>
+      </div>
+      <p id="quality-status" role="status" class="panel-copy"></p>
+      <ul id="quality-records" class="quality-records"></ul>
+      <button class="btn-secondary" id="quality-prev" type="button" hidden>Previous</button>
+      <button class="btn-secondary" id="quality-next" type="button" hidden>Next</button>
+      <div class="control-divider"></div>
+      <h3>Selected trajectory flags</h3>
+      <div class="quality-filters"><label for="trajectory-reason">Flag type</label>
+        <select id="trajectory-reason">
+          <option value="">All flags</option><option value="speed_outlier">Speed outlier</option>
+          <option value="sampling_gap">Sampling gap</option><option value="repeated_coordinate">Repeated coordinate</option>
+        </select></div>
+      <p id="trajectory-status" class="panel-copy" role="status"></p>
+      <ul id="trajectory-flags" class="quality-records"></ul>
+      <div class="quality-disclaimer">Checks are for a demonstration, not medical or scientific validation.</div></article></section>
+    <section class="section panel" id="methods"><h2>Research methods</h2>
+      <p class="panel-copy" id="method-version"></p>
+      <ul class="method-list">
+        <li>Daily distance sums Haversine segments within each study day. Routes split on gaps over two hours and speeds above 120 km/h.</li>
+        <li>Anchor-radius stay detection uses 120 m, a 15-minute minimum, and contiguous observations.</li>
+        <li>Activity area is the convex hull of 100 m buffers in a local projected CRS. GeoJSON coordinates are WGS84 longitude and latitude.</li>
+        <li>Observed Validity Rate uses accepted GPS rows and excludes rows that end speed-flagged segments.</li>
+        <li>Expected Sampling Coverage counts expected slots containing at least one valid observation. N/A means no observation window applies.</li>
+        <li>Daily heart rate is the mean of available values. Steps are per-interval counts. Results describe simulated trajectories.</li>
+      </ul>
+    </section>
+    <footer><span>WEARABLE MOBILITY RESEARCH PIPELINE</span><span>Python · FastAPI · GeoPandas · SQLAlchemy · Leaflet</span></footer>
+  </main>
+</div>
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

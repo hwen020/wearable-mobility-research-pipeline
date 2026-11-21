@@ -1,0 +1,13 @@
+*
+!app/
+!app/**
+!data/
+!data/synthetic_wearable.csv
+!migrations/
+!migrations/**
+!static/
+!static/**
+!alembic.ini
+!requirements.txt
+**/__pycache__/
+**/*.pyc
