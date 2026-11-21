@@ -24,8 +24,8 @@ def live_dashboard(tmp_path, monkeypatch, request):
     for name in ("GPS_WINDOW_START", "GPS_WINDOW_END", "GPS_EXPECTED_INTERVAL_SECONDS"):
         monkeypatch.delenv(name, raising=False)
     mode = getattr(request, "param", None)
-    if mode == "public":
-        monkeypatch.setenv("DEMO_PUBLIC_READONLY", "true")
+    monkeypatch.setenv("DEMO_PUBLIC_READONLY", "true" if mode == "public" else "false")
+    monkeypatch.delenv("DEMO_READ_ONLY", raising=False)
     if mode is True:
         monkeypatch.setenv("GPS_WINDOW_START", "2026-11-16T16:00:00Z")
         monkeypatch.setenv("GPS_WINDOW_END", "2026-11-16T21:05:00Z")

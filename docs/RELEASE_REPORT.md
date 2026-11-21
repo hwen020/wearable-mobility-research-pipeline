@@ -1,6 +1,23 @@
 # Wearable Mobility Research Pipeline v1.0.0 release report
 
 
+## Final local acceptance for the v1.0.0 tag
+
+The workspace was clean at `d88f89c` with no staged or unstaged changes. The original release commit `30378f1` remains an ancestor.
+
+| Check | Final result |
+|---|---|
+| Full regression | PASS. `python -m pytest -q` passed 44 tests in 26.33 seconds with SQLite, temporary MySQL 9.0.1 and Edge enabled. One upstream Starlette TestClient deprecation warning. |
+| Public mutation guard | PASS. POST, PUT, PATCH and DELETE returned 403 before parsing. Public GET requests for health, maps, analytics, exports, diagnostics, assets and docs left the SQLite dump unchanged. GET on the import and restore paths did not execute mutations. |
+| Local full functionality | PASS. Edge exercised CSV upload, ingestion, duplicate feedback and confirmed demo restore with `DEMO_PUBLIC_READONLY=false`. |
+| Render configuration and native smoke | PASS. Blueprint and startup shell syntax were checked. Native Uvicorn bound to `0.0.0.0` on a supplied port. Two seed runs retained 366 observations. HTTP health, maps, analytics, export and public mutation checks passed. |
+| Privacy and fixture integrity | PASS. Review of 77 candidate files found no recognized credentials, personal absolute paths or versioned database/cache artifacts. The synthetic fixture is byte-identical to the baseline. |
+| Docker runtime and Render Free capacity | NOT VERIFIED. A single bounded engine probe timed out. The candidate image runtime and memory/CPU behavior remain unverified. |
+| Hosted Actions, public HTTPS and provider logs | NOT VERIFIED. No remote publication or deployment was performed. |
+
+**GitHub-ready: YES for local source publication.** External publication still requires authorization. Docker runtime, hosted CI and public ingress remain verification gates. Start locally with `.\scripts\start_windows.bat` and open `http://127.0.0.1:8000/`.
+
+
 ## GitHub and Render publication preparation
 
 The existing `30378f1` release is retained in local Git history. Publication preparation adds a Render Free Docker Blueprint, an environment-driven listener, and a public read-only mode. The original synthetic dataset checksum is unchanged.

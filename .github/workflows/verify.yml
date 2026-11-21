@@ -7,6 +7,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       RUN_BROWSER: "1"
     steps:
@@ -23,8 +24,10 @@ jobs:
       - run: python -m pip check
       - run: python -m compileall -q app migrations
       - run: node --check static/app.js
+      - run: sh -n docker-entrypoint.sh
       - run: python -m playwright install --with-deps chromium
-      - run: python -m pytest -q
+      - name: Run API, public read-only and browser regression tests
+        run: python -m pytest -q
       - run: docker build --tag wearable-mobility-research-pipeline:1.0.0 .
       - name: Smoke test the release image
         shell: bash

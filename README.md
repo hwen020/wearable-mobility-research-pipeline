@@ -16,7 +16,7 @@ flowchart LR
     GIS --> UI[Leaflet dashboard and exports]
 ```
 
-**Release verification** · See [v1.0.0 release report](docs/RELEASE_REPORT.md) for SQLite, MySQL, Edge and Docker results.
+**Release verification** - 44 tests passed with Edge Playwright, SQLite and MySQL 9.0.1. Public GET requests preserved database state and local CSV upload and demo restore passed. See the [release report](docs/RELEASE_REPORT.md) for remaining deployment checks.
 
 ## Live Demo
 
